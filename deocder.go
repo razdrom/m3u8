@@ -1,19 +1,17 @@
-package decoder
+package m3u8
 
 import (
 	"bufio"
 	"bytes"
 	"fmt"
 	"io"
-
-	"github.com/razdrom/m3u8"
 )
 
 type Decoder struct {
-	playlist m3u8.Playlist
+	playlist Playlist
 }
 
-func NewDecoder(playlist m3u8.Playlist) *Decoder {
+func NewDecoder(playlist Playlist) *Decoder {
 	return &Decoder{playlist: playlist}
 }
 

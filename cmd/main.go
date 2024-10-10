@@ -7,7 +7,6 @@ import (
 	"path"
 
 	"github.com/razdrom/m3u8"
-	"github.com/razdrom/m3u8/decoder"
 )
 
 func main() {
@@ -24,7 +23,7 @@ func main() {
 	defer file.Close()
 
 	media := &m3u8.MediaPlaylist{}
-	decoder := decoder.NewDecoder(media)
+	decoder := m3u8.NewDecoder(media)
 	err = decoder.Decode(file)
 	if err != nil {
 		log.Fatal(err)
