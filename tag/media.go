@@ -1,8 +1,9 @@
 package tag
 
 import (
-	"m3u8/scanner"
 	"strings"
+
+	"github.com/razdrom/m3u8/scanner"
 )
 
 type Media struct {

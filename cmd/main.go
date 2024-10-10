@@ -3,10 +3,11 @@ package main
 import (
 	"fmt"
 	"log"
-	"m3u8"
-	"m3u8/decoder"
 	"os"
 	"path"
+
+	"github.com/razdrom/m3u8"
+	"github.com/razdrom/m3u8/decoder"
 )
 
 func main() {
@@ -15,19 +16,19 @@ func main() {
 		log.Fatal("ошибка при получении рабочей директории: %w", err)
 	}
 
-	file, err := os.Open(path.Join(dir, "pkg/hls/mocks", "media.m3u8"))
+	file, err := os.Open(path.Join(dir, "test/assets", "media_001.m3u8"))
 	if err != nil {
 		log.Fatal("ошибка при открытии файла: %w", err)
 	}
 
 	defer file.Close()
 
-	master := &m3u8.MasterPlaylist{}
-	decoder := decoder.NewDecoder(master)
+	media := &m3u8.MediaPlaylist{}
+	decoder := decoder.NewDecoder(media)
 	err = decoder.Decode(file)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Println(master)
+	fmt.Println(media)
 }

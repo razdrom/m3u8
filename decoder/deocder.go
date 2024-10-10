@@ -5,7 +5,8 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"m3u8"
+
+	"github.com/razdrom/m3u8"
 )
 
 type Decoder struct {

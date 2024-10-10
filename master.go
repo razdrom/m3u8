@@ -1,6 +1,6 @@
 package m3u8
 
-import "m3u8/tag"
+import "github.com/razdrom/m3u8/tag"
 
 type Variant struct {
 	URI        string

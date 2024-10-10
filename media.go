@@ -1,8 +1,9 @@
 package m3u8
 
 import (
-	"m3u8/tag"
 	"time"
+
+	"github.com/razdrom/m3u8/tag"
 )
 
 type Segment struct {
@@ -21,6 +22,7 @@ type MediaPlaylist struct {
 }
 
 func (pl *MediaPlaylist) ParseTag(key string, value string) {
+	pl.MatchBaseTags(key, value)
 	pl.MatchCommonTags(key, value)
 }
 

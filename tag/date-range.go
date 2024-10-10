@@ -1,9 +1,10 @@
 package tag
 
 import (
-	"m3u8/scanner"
 	"strings"
 	"time"
+
+	"github.com/razdrom/m3u8/scanner"
 )
 
 type DateRange struct {
