@@ -15,6 +15,8 @@ func ParseProgramDateTime(input string) *ProgramDateTime {
 	if err != nil {
 		return nil
 	}
+
+	date = date.In(time.UTC)
 	out.Value = &date
 
 	return &out

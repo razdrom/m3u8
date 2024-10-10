@@ -27,53 +27,46 @@ func (d *Decoder) Decode(reader io.Reader) error {
 			return err
 		}
 
-		err = d.decodeLine(line)
-		if err != nil {
-			return err
+		line = bytes.TrimSpace(line)
+
+		if d.IsBlank(line) {
+			continue
 		}
+
+		if d.IsTag(line) {
+			k, v := d.SplitTag(line)
+			d.playlist.ParseTag(k, v)
+			continue
+		}
+
+		if d.IsURI(line) {
+			uri := string(line)
+			d.playlist.HandleUri(uri)
+			continue
+		}
+
+		return fmt.Errorf("unrecognized m3u8 format")
 	}
 
 	return nil
 }
 
-func (d *Decoder) decodeLine(line []byte) error {
-	line = bytes.TrimSpace(line)
-
-	if d.isBlank(line) {
-		return nil
-	}
-
-	if d.isTag(line) {
-		k, v := d.splitTag(line)
-		d.playlist.ParseTag(k, v)
-		return nil
-	}
-
-	if d.isURI(line) {
-		uri := string(line)
-		d.playlist.HandleUri(uri)
-		return nil
-	}
-
-	return fmt.Errorf("unrecognized m3u8 format")
-}
-
-func (d *Decoder) splitTag(line []byte) (string, string) {
+func (d *Decoder) SplitTag(line []byte) (string, string) {
 	index := bytes.IndexByte(line, ':')
 	if index == -1 {
-		return "", ""
+		return string(line), ""
 	}
 	return string(line[1:index]), string(line[index+1:])
 }
 
-func (d *Decoder) isBlank(line []byte) bool {
+func (d *Decoder) IsBlank(line []byte) bool {
 	return len(line) == 0
 }
 
-func (d *Decoder) isTag(line []byte) bool {
+func (d *Decoder) IsTag(line []byte) bool {
 	return bytes.HasPrefix(line, []byte{'#'})
 }
 
-func (d *Decoder) isURI(line []byte) bool {
-	return !d.isBlank(line) && !d.isTag(line)
+func (d *Decoder) IsURI(line []byte) bool {
+	return !d.IsBlank(line) && !d.IsTag(line)
 }

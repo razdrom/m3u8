@@ -1,6 +1,7 @@
 package tag
 
 import (
+	"strconv"
 	"strings"
 	"time"
 
@@ -8,10 +9,16 @@ import (
 )
 
 type DateRange struct {
-	Id        string
-	Class     string
-	StartDate *time.Time
-	EndOnNext bool
+	Id              string
+	Class           string
+	StartDate       *time.Time
+	EndDate         *time.Time
+	Duration        float64
+	PlannedDuration float64
+	EndOnNext       bool
+	Scte35Cmd       string
+	Scte35Out       string
+	Scte35In        string
 }
 
 func ParseDateRange(input string) *DateRange {
@@ -29,13 +36,42 @@ func ParseDateRange(input string) *DateRange {
 		case "CLASS":
 			out.Class = strings.ReplaceAll(v, `"`, "")
 		case "START-DATE":
+			v = strings.ReplaceAll(v, `"`, "")
 			date, err := time.Parse(time.RFC3339, v)
 			if err != nil {
 				continue
 			}
+			date = date.In(time.UTC)
 			out.StartDate = &date
+		case "END-DATE":
+			v = strings.ReplaceAll(v, `"`, "")
+			date, err := time.Parse(time.RFC3339, v)
+			if err != nil {
+				continue
+			}
+			date = date.In(time.UTC)
+			out.EndDate = &date
 		case "END-ON-NEXT":
 			out.EndOnNext = v == "YES"
+		case "DURATION":
+			parsed, err := strconv.ParseFloat(v, 64)
+			if err != nil {
+				out.Duration = 0
+			}
+			out.Duration = parsed
+		case "PLANNED-DURATION":
+			parsed, err := strconv.ParseFloat(v, 64)
+			if err != nil {
+				out.PlannedDuration = 0
+			}
+			out.PlannedDuration = parsed
+
+		case "SCTE35-CMD":
+			out.Scte35Cmd = strings.ReplaceAll(v, `"`, "")
+		case "SCTE35-OUT":
+			out.Scte35Out = strings.ReplaceAll(v, `"`, "")
+		case "SCTE35-IN":
+			out.Scte35In = strings.ReplaceAll(v, `"`, "")
 		}
 	}
 
