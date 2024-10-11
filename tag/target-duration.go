@@ -16,6 +16,7 @@ func NewTargetDuration(raw string) *TargetDuration {
 }
 
 func (t *TargetDuration) parse() {
+	t.rawparsed = true
 	args := strings.Split(t.raw, ":")
 	if len(args) < 1 {
 		return

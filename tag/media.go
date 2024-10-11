@@ -29,6 +29,7 @@ func NewMedia(raw string) *Media {
 }
 
 func (t *Media) parse() {
+	t.rawparsed = true
 	if t.raw == "" {
 		return
 	}

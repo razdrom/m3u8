@@ -1,9 +1,8 @@
-package test
+package m3u8
 
 import (
 	"testing"
 
-	"github.com/razdrom/m3u8"
 	"github.com/stretchr/testify/require"
 )
 
@@ -30,7 +29,7 @@ func Test_Decoder_splitTag(t *testing.T) {
 		"EXT-X-STREAM-INF":        `BANDWIDTH=6371345,RESOLUTION=1920x1080,CODECS="avc1.640028,mp4a.40.2",VIDEO="chunked",FRAME-RATE=30.000`,
 	}
 
-	decoder := m3u8.NewDecoder(nil)
+	decoder := NewDecoder(nil)
 	for _, item := range data {
 		key, value := decoder.SplitTag([]byte(item))
 		require.Equal(t, results[key], value)
@@ -38,21 +37,21 @@ func Test_Decoder_splitTag(t *testing.T) {
 }
 
 func Test_Decoder_IsBlank(t *testing.T) {
-	decoder := m3u8.NewDecoder(nil)
+	decoder := NewDecoder(nil)
 	require.Equal(t, false, decoder.IsBlank([]byte("#EXTM3U")))
 	require.Equal(t, false, decoder.IsBlank([]byte("https://example.com.hls.net/playlist/Cv4EtbciG9p.m3u8")))
 	require.Equal(t, true, decoder.IsBlank([]byte("")))
 }
 
 func Test_Decoder_IsTag(t *testing.T) {
-	decoder := m3u8.NewDecoder(nil)
+	decoder := NewDecoder(nil)
 	require.Equal(t, true, decoder.IsTag([]byte("#EXTM3U")))
 	require.Equal(t, false, decoder.IsTag([]byte("https://example.com.hls.net/playlist/Cv4EtbciG9p.m3u8")))
 	require.Equal(t, false, decoder.IsTag([]byte("")))
 }
 
 func Test_Decoder_IsURI(t *testing.T) {
-	decoder := m3u8.NewDecoder(nil)
+	decoder := NewDecoder(nil)
 	require.Equal(t, false, decoder.IsURI([]byte("#EXTM3U")))
 	require.Equal(t, true, decoder.IsURI([]byte("https://example.com.hls.net/playlist/Cv4EtbciG9p.m3u8")))
 	require.Equal(t, false, decoder.IsURI([]byte("")))

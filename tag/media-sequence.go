@@ -15,6 +15,7 @@ func NewMediaSequence(raw string) *MediaSequence {
 }
 
 func (t *MediaSequence) parse() {
+	t.rawparsed = true
 	value, err := strconv.ParseInt(t.raw, 10, 64)
 	if err != nil {
 		return

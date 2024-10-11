@@ -1,4 +1,4 @@
-package test
+package m3u8
 
 import (
 	"fmt"
@@ -7,7 +7,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/razdrom/m3u8"
 	"github.com/stretchr/testify/require"
 )
 
@@ -26,8 +25,8 @@ func Test_Decode_Master_001(t *testing.T) {
 
 	defer stream.Close()
 
-	playlist := m3u8.MasterPlaylist{}
-	decoder := m3u8.NewDecoder(&playlist)
+	playlist := MasterPlaylist{}
+	decoder := NewDecoder(&playlist)
 	err = decoder.Decode(stream)
 	require.NoError(t, err)
 
@@ -100,8 +99,8 @@ func Test_Decode_Media_001(t *testing.T) {
 
 	defer stream.Close()
 
-	playlist := m3u8.MediaPlaylist{}
-	decoder := m3u8.NewDecoder(&playlist)
+	playlist := MediaPlaylist{}
+	decoder := NewDecoder(&playlist)
 	err = decoder.Decode(stream)
 	require.NoError(t, err)
 

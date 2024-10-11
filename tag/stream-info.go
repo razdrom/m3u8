@@ -33,6 +33,7 @@ func NewStreamInfo(raw string) *StreamInfo {
 }
 
 func (t *StreamInfo) parse() {
+	t.rawparsed = true
 	hm := scanner.ScanArgs(t.raw)
 	for k, v := range hm {
 		if k == "" || v == "" {

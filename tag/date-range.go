@@ -29,6 +29,7 @@ func NewDateRange(raw string) *DateRange {
 }
 
 func (t *DateRange) parse() {
+	t.rawparsed = true
 	hm := scanner.ScanArgs(t.raw)
 	for k, v := range hm {
 		if k == "" || v == "" {

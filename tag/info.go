@@ -19,6 +19,7 @@ func NewInfo(raw string) *Info {
 }
 
 func (t *Info) parse() {
+	t.rawparsed = true
 	args := strings.Split(t.raw, ",")
 	if len(args) < 1 {
 		return

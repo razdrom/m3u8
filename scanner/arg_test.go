@@ -1,10 +1,9 @@
-package test
+package scanner
 
 import (
 	"strings"
 	"testing"
 
-	"github.com/razdrom/m3u8/scanner"
 	"github.com/stretchr/testify/require"
 )
 
@@ -64,7 +63,7 @@ func Test_Args_ScanArgs(t *testing.T) {
 	}
 
 	joinedArgs := strings.Join(data, ",")
-	scans := scanner.ScanArgs(joinedArgs)
+	scans := ScanArgs(joinedArgs)
 	for key, value := range scans {
 		require.Equal(t, results[key], value)
 	}

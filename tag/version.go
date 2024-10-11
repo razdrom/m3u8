@@ -17,6 +17,7 @@ func NewVersion(raw string) *Version {
 }
 
 func (t *Version) parse() {
+	t.rawparsed = true
 	if version, err := strconv.ParseInt(t.raw, 10, 64); err == nil {
 		t.value = version
 	}

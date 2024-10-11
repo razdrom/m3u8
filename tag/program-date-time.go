@@ -15,6 +15,7 @@ func NewProgramDateTime(raw string) *ProgramDateTime {
 }
 
 func (t *ProgramDateTime) parse() {
+	t.rawparsed = true
 	date, err := time.Parse(time.RFC3339, t.raw)
 	if err != nil {
 		return
