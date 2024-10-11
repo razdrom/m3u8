@@ -1,13 +1,13 @@
 package test
 
 import (
+	"fmt"
 	"os"
 	"path"
 	"testing"
 	"time"
 
 	"github.com/razdrom/m3u8"
-	"github.com/razdrom/m3u8/tag"
 	"github.com/stretchr/testify/require"
 )
 
@@ -31,28 +31,63 @@ func Test_Decode_Master_001(t *testing.T) {
 	err = decoder.Decode(stream)
 	require.NoError(t, err)
 
-	variants := []m3u8.Variant{
-		{URI: "https://example.com/v1/playlist/1920p30.m3u8", Media: &tag.Media{Type: "VIDEO", GroupId: "chunked", Name: "1080p (source)", Autoselect: true, Default: true}, StreamInfo: &tag.StreamInfo{Bandwidth: int64(6371345), Resolution: "1920x1080", Codecs: "avc1.640028,mp4a.40.2", Video: "chunked", FrameRate: float64(30.000)}},
-		{URI: "https://example.com/v1/playlist/720p30.m3u8", Media: &tag.Media{Type: "VIDEO", GroupId: "720p30", Name: "720p", Autoselect: true, Default: true}, StreamInfo: &tag.StreamInfo{Bandwidth: int64(2373000), Resolution: "1280x720", Codecs: "avc1.4D401F,mp4a.40.2", Video: "720p30", FrameRate: float64(30.000)}},
-		{URI: "https://example.com/v1/playlist/480p30.m3u8", Media: &tag.Media{Type: "VIDEO", GroupId: "480p30", Name: "480p", Autoselect: true, Default: true}, StreamInfo: &tag.StreamInfo{Bandwidth: int64(1427999), Resolution: "852x480", Codecs: "avc1.4D401F,mp4a.40.2", Video: "480p30", FrameRate: float64(30.000)}},
-		{URI: "https://example.com/v1/playlist/360p30.m3u8", Media: &tag.Media{Type: "VIDEO", GroupId: "360p30", Name: "360p", Autoselect: true, Default: true}, StreamInfo: &tag.StreamInfo{Bandwidth: int64(630000), Resolution: "640x360", Codecs: "avc1.4D401F,mp4a.40.2", Video: "360p30", FrameRate: float64(30.000)}},
-		{URI: "https://example.com/v1/playlist/160p30.m3u8", Media: &tag.Media{Type: "VIDEO", GroupId: "160p30", Name: "160p", Autoselect: true, Default: true}, StreamInfo: &tag.StreamInfo{Bandwidth: int64(230000), Resolution: "284x160", Codecs: "avc1.4D401F,mp4a.40.2", Video: "160p30", FrameRate: float64(30.000)}},
-		{URI: "https://example.com/v1/playlist/audio_only.m3u8", Media: &tag.Media{Type: "VIDEO", GroupId: "audio_only", Name: "audio_only", Autoselect: false, Default: false}, StreamInfo: &tag.StreamInfo{Bandwidth: int64(160000), Resolution: "", Codecs: "mp4a.40.2", Video: "audio_only", FrameRate: float64(0.000)}},
+	variants := []map[string]map[string]any{
+		{
+			"uri":    map[string]any{"value": "https://example.com/v1/playlist/1920p30.m3u8"},
+			"media":  map[string]any{"mediaType": "VIDEO", "groupId": "chunked", "name": "1080p (source)", "isAutoselect": true, "isDefault": true},
+			"stream": map[string]any{"bandwidth": int64(6371345), "resolution": "1920x1080", "codecs": "avc1.640028,mp4a.40.2", "video": "chunked", "frameRate": float64(30.000)},
+		},
+		{
+			"uri":    map[string]any{"value": "https://example.com/v1/playlist/720p30.m3u8"},
+			"media":  map[string]any{"mediaType": "VIDEO", "groupId": "720p30", "name": "720p", "isAutoselect": true, "isDefault": true},
+			"stream": map[string]any{"bandwidth": int64(2373000), "resolution": "1280x720", "codecs": "avc1.4D401F,mp4a.40.2", "video": "720p30", "frameRate": float64(30.000)},
+		},
+		{
+			"uri":    map[string]any{"value": "https://example.com/v1/playlist/480p30.m3u8"},
+			"media":  map[string]any{"mediaType": "VIDEO", "groupId": "480p30", "name": "480p", "isAutoselect": true, "isDefault": true},
+			"stream": map[string]any{"bandwidth": int64(1427999), "resolution": "852x480", "codecs": "avc1.4D401F,mp4a.40.2", "video": "480p30", "frameRate": float64(30.000)},
+		},
+		{
+			"uri":    map[string]any{"value": "https://example.com/v1/playlist/360p30.m3u8"},
+			"media":  map[string]any{"mediaType": "VIDEO", "groupId": "360p30", "name": "360p", "isAutoselect": true, "isDefault": true},
+			"stream": map[string]any{"bandwidth": int64(630000), "resolution": "640x360", "codecs": "avc1.4D401F,mp4a.40.2", "video": "360p30", "frameRate": float64(30.000)},
+		},
+		{
+			"uri":    map[string]any{"value": "https://example.com/v1/playlist/160p30.m3u8"},
+			"media":  map[string]any{"mediaType": "VIDEO", "groupId": "160p30", "name": "160p", "isAutoselect": true, "isDefault": true},
+			"stream": map[string]any{"bandwidth": int64(230000), "resolution": "284x160", "codecs": "avc1.4D401F,mp4a.40.2", "video": "160p30", "frameRate": float64(30.000)},
+		},
+		{
+			"uri":    map[string]any{"value": "https://example.com/v1/playlist/audio_only.m3u8"},
+			"media":  map[string]any{"mediaType": "VIDEO", "groupId": "audio_only", "name": "audio_only", "isAutoselect": false, "isDefault": false},
+			"stream": map[string]any{"bandwidth": int64(160000), "resolution": "", "codecs": "mp4a.40.2", "video": "audio_only", "frameRate": float64(0.000)},
+		},
 	}
 
 	require.Equal(t, len(variants), len(playlist.Variants))
+
 	for i, variant := range playlist.Variants {
-		require.Equal(t, variants[i].URI, variant.URI)
-		require.Equal(t, variants[i].Media.Type, variant.Media.Type)
-		require.Equal(t, variants[i].Media.GroupId, variant.Media.GroupId)
-		require.Equal(t, variants[i].Media.Name, variant.Media.Name)
-		require.Equal(t, variants[i].Media.Autoselect, variant.Media.Autoselect)
-		require.Equal(t, variants[i].Media.Default, variant.Media.Default)
-		require.Equal(t, variants[i].StreamInfo.Bandwidth, variant.StreamInfo.Bandwidth)
-		require.Equal(t, variants[i].StreamInfo.Resolution, variant.StreamInfo.Resolution)
-		require.Equal(t, variants[i].StreamInfo.Codecs, variant.StreamInfo.Codecs)
-		require.Equal(t, variants[i].StreamInfo.Video, variant.StreamInfo.Video)
-		require.Equal(t, variants[i].StreamInfo.FrameRate, variant.StreamInfo.FrameRate)
+		uri := variants[i]["uri"]
+		media := variants[i]["media"]
+		stream := variants[i]["stream"]
+
+		var resolution string = ""
+		hw := variant.StreamInfo.GetResolution()
+		if hw != nil {
+			resolution = fmt.Sprintf("%dx%d", hw.Height, hw.Width)
+		}
+
+		require.Equal(t, uri["value"], variant.URI)
+		require.Equal(t, media["mediaType"], variant.Media.GetType())
+		require.Equal(t, media["groupId"], variant.Media.GetGroupId())
+		require.Equal(t, media["name"], variant.Media.GetName())
+		require.Equal(t, media["isAutoselect"], variant.Media.GetAutoselect())
+		require.Equal(t, media["isDefault"], variant.Media.GetDefault())
+		require.Equal(t, stream["bandwidth"], variant.StreamInfo.GetBandwidth())
+		require.Equal(t, stream["resolution"], resolution)
+		require.Equal(t, stream["codecs"], variant.StreamInfo.GetCodecs())
+		require.Equal(t, stream["video"], variant.StreamInfo.GetVideo())
+		require.Equal(t, stream["frameRate"], variant.StreamInfo.GetFrameRate())
 	}
 }
 
@@ -70,48 +105,52 @@ func Test_Decode_Media_001(t *testing.T) {
 	err = decoder.Decode(stream)
 	require.NoError(t, err)
 
-	dateranges := []tag.DateRange{
-		{Id: "playlist-creation-1728470443", Class: "timestamp", StartDate: timeconv("2024-10-09T03:40:43.795-07:00"), EndOnNext: true},
-		{Id: "playlist-session-1728470443", Class: "twitch-session", StartDate: timeconv("2024-10-09T03:40:43.795-07:00"), EndOnNext: true},
-		{Id: "source-1728470409", Class: "twitch-stream-source", StartDate: timeconv("2024-10-09T10:40:09.498Z"), EndOnNext: true},
-		{Id: "trigger-1728470409", Class: "twitch-trigger", StartDate: timeconv("2024-10-09T10:40:09.498Z"), EndOnNext: true},
-	}
+	require.Equal(t, int64(3), playlist.Version.GetValue())
+	require.Equal(t, int64(6), playlist.TargetDuration.GetValue())
+	require.Equal(t, int64(60734), playlist.MediaSequence.GetValue())
 
-	segments := []m3u8.Segment{
-		{URI: "https://example.com/v1/segment/segment_001.ts", ProgramDateTime: timeconv("2024-10-09T10:40:09.498Z"), Info: &tag.Info{Druation: float64(2.000), Title: "live"}},
-		{URI: "https://example.com/v1/segment/segment_002.ts", ProgramDateTime: timeconv("2024-10-09T10:40:11.498Z"), Info: &tag.Info{Druation: float64(2.000), Title: "live"}},
-		{URI: "https://example.com/v1/segment/segment_003.ts", ProgramDateTime: timeconv("2024-10-09T10:40:13.498Z"), Info: &tag.Info{Druation: float64(2.000), Title: "live"}},
-		{URI: "https://example.com/v1/segment/segment_004.ts", ProgramDateTime: timeconv("2024-10-09T10:40:15.498Z"), Info: &tag.Info{Druation: float64(2.000), Title: "live"}},
-		{URI: "https://example.com/v1/segment/segment_005.ts", ProgramDateTime: timeconv("2024-10-09T10:40:17.498Z"), Info: &tag.Info{Druation: float64(2.000), Title: "live"}},
-		{URI: "https://example.com/v1/segment/segment_006.ts", ProgramDateTime: timeconv("2024-10-09T10:40:19.498Z"), Info: &tag.Info{Druation: float64(2.000), Title: "live"}},
-		{URI: "https://example.com/v1/segment/segment_007.ts", ProgramDateTime: timeconv("2024-10-09T10:40:21.498Z"), Info: &tag.Info{Druation: float64(2.000), Title: "live"}},
-		{URI: "https://example.com/v1/segment/segment_008.ts", ProgramDateTime: timeconv("2024-10-09T10:40:23.498Z"), Info: &tag.Info{Druation: float64(2.000), Title: "live"}},
-		{URI: "https://example.com/v1/segment/segment_009.ts", ProgramDateTime: timeconv("2024-10-09T10:40:25.498Z"), Info: &tag.Info{Druation: float64(2.000), Title: "live"}},
-		{URI: "https://example.com/v1/segment/segment_010.ts", ProgramDateTime: timeconv("2024-10-09T10:40:27.498Z"), Info: &tag.Info{Druation: float64(2.000), Title: "live"}},
-		{URI: "https://example.com/v1/segment/segment_011.ts", ProgramDateTime: timeconv("2024-10-09T10:40:29.498Z"), Info: &tag.Info{Druation: float64(2.000), Title: "live"}},
-		{URI: "https://example.com/v1/segment/segment_012.ts", ProgramDateTime: timeconv("2024-10-09T10:40:31.498Z"), Info: &tag.Info{Druation: float64(2.000), Title: "live"}},
-		{URI: "https://example.com/v1/segment/segment_013.ts", ProgramDateTime: timeconv("2024-10-09T10:40:33.498Z"), Info: &tag.Info{Druation: float64(2.000), Title: "live"}},
-		{URI: "https://example.com/v1/segment/segment_014.ts", ProgramDateTime: timeconv("2024-10-09T10:40:35.498Z"), Info: &tag.Info{Druation: float64(2.000), Title: "live"}},
-		{URI: "https://example.com/v1/segment/segment_015.ts", ProgramDateTime: timeconv("2024-10-09T10:40:37.498Z"), Info: &tag.Info{Druation: float64(2.000), Title: "live"}},
+	dateranges := []map[string]string{
+		{"id": "playlist-creation-1728470443", "class": "timestamp", "startDate": "2024-10-09T03:40:43.795-07:00", "endOnNext": "YES"},
+		{"id": "playlist-session-1728470443", "class": "twitch-session", "startDate": "2024-10-09T03:40:43.795-07:00", "endOnNext": "YES"},
+		{"id": "source-1728470409", "class": "twitch-stream-source", "startDate": "2024-10-09T10:40:09.498Z", "endOnNext": "YES"},
+		{"id": "trigger-1728470409", "class": "twitch-trigger", "startDate": "2024-10-09T10:40:09.498Z", "endOnNext": "YES"},
 	}
-
-	require.Equal(t, int64(3), playlist.Version)
-	require.Equal(t, int64(6), playlist.TargetDuration)
-	require.Equal(t, int64(60734), playlist.MediaSequence)
 
 	require.Equal(t, len(dateranges), len(playlist.DateRanges))
 	for i, rng := range playlist.DateRanges {
-		require.Equal(t, dateranges[i].Id, rng.Id)
-		require.Equal(t, dateranges[i].Class, rng.Class)
-		require.Equal(t, dateranges[i].StartDate, rng.StartDate)
-		require.Equal(t, dateranges[i].EndOnNext, rng.EndOnNext)
+		startDate := timeconv(dateranges[i]["startDate"])
+		endOnNext := dateranges[i]["endOnNext"] == "YES"
+		require.Equal(t, dateranges[i]["id"], rng.GetId())
+		require.Equal(t, dateranges[i]["class"], rng.GetClass())
+		require.Equal(t, startDate, rng.GetStartDate())
+		require.Equal(t, endOnNext, rng.GetEndOnNext())
+	}
+
+	segments := []map[string]any{
+		{"uri": "https://example.com/v1/segment/segment_001.ts", "programDateTime": "2024-10-09T10:40:09.498Z", "infoDuration": float64(2.000), "infoTitle": "live"},
+		{"uri": "https://example.com/v1/segment/segment_002.ts", "programDateTime": "2024-10-09T10:40:11.498Z", "infoDuration": float64(2.000), "infoTitle": "live"},
+		{"uri": "https://example.com/v1/segment/segment_003.ts", "programDateTime": "2024-10-09T10:40:13.498Z", "infoDuration": float64(2.000), "infoTitle": "live"},
+		{"uri": "https://example.com/v1/segment/segment_004.ts", "programDateTime": "2024-10-09T10:40:15.498Z", "infoDuration": float64(2.000), "infoTitle": "live"},
+		{"uri": "https://example.com/v1/segment/segment_005.ts", "programDateTime": "2024-10-09T10:40:17.498Z", "infoDuration": float64(2.000), "infoTitle": "live"},
+		{"uri": "https://example.com/v1/segment/segment_006.ts", "programDateTime": "2024-10-09T10:40:19.498Z", "infoDuration": float64(2.000), "infoTitle": "live"},
+		{"uri": "https://example.com/v1/segment/segment_007.ts", "programDateTime": "2024-10-09T10:40:21.498Z", "infoDuration": float64(2.000), "infoTitle": "live"},
+		{"uri": "https://example.com/v1/segment/segment_008.ts", "programDateTime": "2024-10-09T10:40:23.498Z", "infoDuration": float64(2.000), "infoTitle": "live"},
+		{"uri": "https://example.com/v1/segment/segment_009.ts", "programDateTime": "2024-10-09T10:40:25.498Z", "infoDuration": float64(2.000), "infoTitle": "live"},
+		{"uri": "https://example.com/v1/segment/segment_010.ts", "programDateTime": "2024-10-09T10:40:27.498Z", "infoDuration": float64(2.000), "infoTitle": "live"},
+		{"uri": "https://example.com/v1/segment/segment_011.ts", "programDateTime": "2024-10-09T10:40:29.498Z", "infoDuration": float64(2.000), "infoTitle": "live"},
+		{"uri": "https://example.com/v1/segment/segment_012.ts", "programDateTime": "2024-10-09T10:40:31.498Z", "infoDuration": float64(2.000), "infoTitle": "live"},
+		{"uri": "https://example.com/v1/segment/segment_013.ts", "programDateTime": "2024-10-09T10:40:33.498Z", "infoDuration": float64(2.000), "infoTitle": "live"},
+		{"uri": "https://example.com/v1/segment/segment_014.ts", "programDateTime": "2024-10-09T10:40:35.498Z", "infoDuration": float64(2.000), "infoTitle": "live"},
+		{"uri": "https://example.com/v1/segment/segment_015.ts", "programDateTime": "2024-10-09T10:40:37.498Z", "infoDuration": float64(2.000), "infoTitle": "live"},
 	}
 
 	require.Equal(t, len(segments), len(playlist.Segments))
 	for i, seg := range playlist.Segments {
-		require.Equal(t, segments[i].URI, seg.URI)
-		require.Equal(t, segments[i].ProgramDateTime, seg.ProgramDateTime)
-		require.Equal(t, segments[i].Info.Druation, seg.Info.Druation)
-		require.Equal(t, segments[i].Info.Title, seg.Info.Title)
+		programDateTime := timeconv(segments[i]["programDateTime"].(string))
+		duration := segments[i]["infoDuration"].(float64)
+		require.Equal(t, segments[i]["uri"], seg.URI)
+		require.Equal(t, programDateTime, seg.ProgramDateTime.GetValue())
+		require.Equal(t, duration, seg.Info.GetDuration())
+		require.Equal(t, segments[i]["infoTitle"], seg.Info.GetTitle())
 	}
 }

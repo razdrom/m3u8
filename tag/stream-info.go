@@ -7,23 +7,33 @@ import (
 	"github.com/razdrom/m3u8/scanner"
 )
 
-type StreamInfo struct {
-	Bandwidth        int64
-	AverageBandwidth int64
-	Resolution       string
-	Codecs           string
-	Audio            string
-	Video            string
-	FrameRate        float64
-	HdcpLevel        string
-	Subtitles        string
-	ClosedCaptions   string
+type Resolution struct {
+	Height int64
+	Width  int64
 }
 
-func ParseStreamInfo(input string) *StreamInfo {
-	out := StreamInfo{}
+type StreamInfo struct {
+	raw       string
+	rawparsed bool
 
-	hm := scanner.ScanArgs(input)
+	bandwidth        int64
+	averageBandwidth int64
+	resolution       *Resolution
+	codecs           string
+	audio            string
+	video            string
+	frameRate        float64
+	hdcpLevel        string
+	subtitles        string
+	closedCaptions   string
+}
+
+func NewStreamInfo(raw string) *StreamInfo {
+	return &StreamInfo{raw: raw}
+}
+
+func (t *StreamInfo) parse() {
+	hm := scanner.ScanArgs(t.raw)
 	for k, v := range hm {
 		if k == "" || v == "" {
 			continue
@@ -31,34 +41,113 @@ func ParseStreamInfo(input string) *StreamInfo {
 
 		switch k {
 		case "AUDIO":
-			out.Audio = strings.ReplaceAll(v, `"`, "")
+			t.audio = strings.ReplaceAll(v, `"`, "")
 		case "AVERAGE-BANDWIDTH":
 			if parsed, err := strconv.ParseInt(v, 10, 64); err == nil {
-				out.AverageBandwidth = parsed
+				t.averageBandwidth = parsed
 			}
 		case "BANDWIDTH":
 			if parsed, err := strconv.ParseInt(v, 10, 64); err == nil {
-				out.Bandwidth = parsed
+				t.bandwidth = parsed
 			}
 		case "RESOLUTION":
-			out.Resolution = v
+			hw := strings.Split(v, "x")
+			if len(hw) == 2 {
+				height, err := strconv.ParseInt(hw[0], 10, 64)
+				if err != nil {
+					continue
+				}
+				width, err := strconv.ParseInt(hw[1], 10, 64)
+				if err != nil {
+					continue
+				}
+
+				t.resolution = &Resolution{Height: height, Width: width}
+			}
 		case "CODECS":
-			out.Codecs = strings.ReplaceAll(v, `"`, "")
+			t.codecs = strings.ReplaceAll(v, `"`, "")
 		case "VIDEO":
-			out.Video = strings.ReplaceAll(v, `"`, "")
+			t.video = strings.ReplaceAll(v, `"`, "")
 		case "FRAME-RATE":
 			if parsed, err := strconv.ParseFloat(v, 64); err == nil {
-				out.FrameRate = parsed
+				t.frameRate = parsed
 			}
 		case "HDCP-LEVEL":
-			out.HdcpLevel = v
+			t.hdcpLevel = v
 		case "SUBTITLES":
-			out.Subtitles = strings.ReplaceAll(v, `"`, "")
+			t.subtitles = strings.ReplaceAll(v, `"`, "")
 		case "CLOSED-CAPTIONS":
-			out.ClosedCaptions = strings.ReplaceAll(v, `"`, "")
+			t.closedCaptions = strings.ReplaceAll(v, `"`, "")
 		}
-
 	}
+}
 
-	return &out
+func (t *StreamInfo) GetBandwidth() int64 {
+	if !t.rawparsed {
+		t.parse()
+	}
+	return t.bandwidth
+}
+
+func (t *StreamInfo) GetAverageBandwidth() int64 {
+	if !t.rawparsed {
+		t.parse()
+	}
+	return t.averageBandwidth
+}
+
+func (t *StreamInfo) GetResolution() *Resolution {
+	if !t.rawparsed {
+		t.parse()
+	}
+	return t.resolution
+}
+
+func (t *StreamInfo) GetCodecs() string {
+	if !t.rawparsed {
+		t.parse()
+	}
+	return t.codecs
+}
+
+func (t *StreamInfo) GetAudio() string {
+	if !t.rawparsed {
+		t.parse()
+	}
+	return t.audio
+}
+
+func (t *StreamInfo) GetVideo() string {
+	if !t.rawparsed {
+		t.parse()
+	}
+	return t.video
+}
+
+func (t *StreamInfo) GetFrameRate() float64 {
+	if !t.rawparsed {
+		t.parse()
+	}
+	return t.frameRate
+}
+
+func (t *StreamInfo) GetHdcpLevel() string {
+	if !t.rawparsed {
+		t.parse()
+	}
+	return t.hdcpLevel
+}
+
+func (t *StreamInfo) GetSubtitles() string {
+	if !t.rawparsed {
+		t.parse()
+	}
+	return t.subtitles
+}
+
+func (t *StreamInfo) GetClosedCaptions() string {
+	if !t.rawparsed {
+		t.parse()
+	}
+	return t.closedCaptions
 }

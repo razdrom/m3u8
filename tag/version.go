@@ -7,18 +7,25 @@ import (
 // https://datatracker.ietf.org/doc/html/rfc8216#section-4.3.1.2
 
 type Version struct {
-	Value int64
+	raw       string
+	rawparsed bool
+	value     int64
 }
 
-func ParseVersion(input string) *Version {
-	out := Version{}
+func NewVersion(raw string) *Version {
+	return &Version{raw: raw}
+}
 
-	version, err := strconv.ParseInt(input, 10, 64)
-	if err != nil {
-		return nil
+func (t *Version) parse() {
+	if version, err := strconv.ParseInt(t.raw, 10, 64); err == nil {
+		t.value = version
+	}
+}
+
+func (t *Version) GetValue() int64 {
+	if !t.rawparsed {
+		t.parse()
 	}
 
-	out.Value = version
-
-	return &out
+	return t.value
 }

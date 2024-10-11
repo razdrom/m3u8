@@ -6,21 +6,33 @@ import (
 )
 
 type TargetDuration struct {
-	Value int64
+	raw       string
+	rawparsed bool
+	value     int64
 }
 
-func ParseTargetDuration(input string) *TargetDuration {
-	out := TargetDuration{}
-	args := strings.Split(input, ":")
+func NewTargetDuration(raw string) *TargetDuration {
+	return &TargetDuration{raw: raw}
+}
+
+func (t *TargetDuration) parse() {
+	args := strings.Split(t.raw, ":")
 	if len(args) < 1 {
-		return nil
+		return
 	}
 
 	value, err := strconv.ParseInt(args[0], 10, 64)
 	if err != nil {
-		return nil
+		return
 	}
 
-	out.Value = value
-	return &out
+	t.value = value
+}
+
+func (t *TargetDuration) GetValue() int64 {
+	if !t.rawparsed {
+		t.parse()
+	}
+
+	return t.value
 }

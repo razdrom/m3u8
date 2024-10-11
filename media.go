@@ -1,22 +1,20 @@
 package m3u8
 
 import (
-	"time"
-
 	"github.com/razdrom/m3u8/tag"
 )
 
 type Segment struct {
 	URI             string
-	ProgramDateTime *time.Time
+	ProgramDateTime *tag.ProgramDateTime
 	Info            *tag.Info
 }
 
 type MediaPlaylist struct {
 	BasePlaylist
 	tmpsegment     *Segment
-	TargetDuration int64
-	MediaSequence  int64
+	TargetDuration *tag.TargetDuration
+	MediaSequence  *tag.MediaSequence
 	DateRanges     []tag.DateRange
 	Segments       []Segment
 }
@@ -34,34 +32,23 @@ func (pl *MediaPlaylist) MatchCommonTags(key string, value string) {
 		if pl.tmpsegment == nil {
 			pl.tmpsegment = &Segment{}
 		}
-		pl.tmpsegment.Info = tag.ParseInfo(value)
+		pl.tmpsegment.Info = tag.NewInfo(value)
 	case "EXT-X-BYTERANGE":
 	case "EXT-X-DISCONTINUITY":
 	case "EXT-X-KEY":
 	case "EXT-X-MAP":
 	case "EXT-X-PROGRAM-DATE-TIME":
-		programDateTime := tag.ParseProgramDateTime(value)
-		if programDateTime != nil && programDateTime.Value != nil {
-			if pl.tmpsegment == nil {
-				pl.tmpsegment = &Segment{}
-			}
-			pl.tmpsegment.ProgramDateTime = programDateTime.Value
+		if pl.tmpsegment == nil {
+			pl.tmpsegment = &Segment{}
 		}
+		pl.tmpsegment.ProgramDateTime = tag.NewProgramDateTime(value)
 	case "EXT-X-DATERANGE":
-		dr := tag.ParseDateRange(value)
-		if dr != nil {
-			pl.DateRanges = append(pl.DateRanges, *dr)
-		}
+		dateRange := tag.NewDateRange(value)
+		pl.DateRanges = append(pl.DateRanges, *dateRange)
 	case "EXT-X-TARGETDURATION":
-		targetDuration := tag.ParseTargetDuration(value)
-		if targetDuration != nil && targetDuration.Value != 0 {
-			pl.TargetDuration = targetDuration.Value
-		}
+		pl.TargetDuration = tag.NewTargetDuration(value)
 	case "EXT-X-MEDIA-SEQUENCE":
-		mediaSequence := tag.ParseMediaSequence(value)
-		if mediaSequence != nil && mediaSequence.Value != 0 {
-			pl.MediaSequence = mediaSequence.Value
-		}
+		pl.MediaSequence = tag.NewMediaSequence(value)
 	case "EXT-X-DISCONTINUITY-SEQUENCE":
 	case "EXT-X-ENDLIST":
 	case "EXT-X-PLAYLIST-TYPE":

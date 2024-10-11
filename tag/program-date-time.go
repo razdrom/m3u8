@@ -5,19 +5,29 @@ import (
 )
 
 type ProgramDateTime struct {
-	Value *time.Time
+	raw       string
+	rawparsed bool
+	value     *time.Time
 }
 
-func ParseProgramDateTime(input string) *ProgramDateTime {
-	out := ProgramDateTime{}
+func NewProgramDateTime(raw string) *ProgramDateTime {
+	return &ProgramDateTime{raw: raw}
+}
 
-	date, err := time.Parse(time.RFC3339, input)
+func (t *ProgramDateTime) parse() {
+	date, err := time.Parse(time.RFC3339, t.raw)
 	if err != nil {
-		return nil
+		return
 	}
 
 	date = date.In(time.UTC)
-	out.Value = &date
+	t.value = &date
+}
 
-	return &out
+func (t *ProgramDateTime) GetValue() *time.Time {
+	if !t.rawparsed {
+		t.parse()
+	}
+
+	return t.value
 }

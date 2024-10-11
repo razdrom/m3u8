@@ -7,24 +7,33 @@ import (
 )
 
 type Media struct {
-	Type            string
-	GroupId         string
-	Name            string
-	Autoselect      bool
-	Default         bool
-	Uri             string
-	Language        string
-	AssocLanguage   string
-	Forced          bool
-	InstreamId      string
-	Characteristics []string
-	Channels        string
+	raw       string
+	rawparsed bool
+
+	mediaType       string
+	groupId         string
+	name            string
+	isAutoselect    bool
+	isDefault       bool
+	uri             string
+	language        string
+	assocLanguage   string
+	isForced        bool
+	instreamId      string
+	characteristics []string
+	channels        string
 }
 
-func ParseMedia(input string) *Media {
-	out := Media{}
+func NewMedia(raw string) *Media {
+	return &Media{raw: raw}
+}
 
-	hm := scanner.ScanArgs(input)
+func (t *Media) parse() {
+	if t.raw == "" {
+		return
+	}
+
+	hm := scanner.ScanArgs(t.raw)
 	for k, v := range hm {
 		if k == "" || v == "" {
 			continue
@@ -32,32 +41,122 @@ func ParseMedia(input string) *Media {
 
 		switch k {
 		case "TYPE":
-			out.Type = v
+			t.mediaType = v
 		case "GROUP-ID":
-			out.GroupId = strings.ReplaceAll(v, `"`, "")
+			v = strings.ReplaceAll(v, `"`, "")
+			t.groupId = v
 		case "NAME":
-			out.Name = strings.ReplaceAll(v, `"`, "")
+			v = strings.ReplaceAll(v, `"`, "")
+			t.name = v
 		case "AUTOSELECT":
-			out.Autoselect = v == "YES"
+
+			t.isAutoselect = v == "YES"
 		case "DEFAULT":
-			out.Default = v == "YES"
+			t.isDefault = v == "YES"
 		case "FORCED":
-			out.Forced = v == "YES"
+			t.isForced = v == "YES"
 		case "URI":
-			out.Uri = strings.ReplaceAll(v, `"`, "")
+			v = strings.ReplaceAll(v, `"`, "")
+			t.uri = v
 		case "LANGUAGE":
-			out.Language = strings.ReplaceAll(v, `"`, "")
+			v = strings.ReplaceAll(v, `"`, "")
+			t.language = v
 		case "ASSOC-LANGUAGE":
-			out.AssocLanguage = strings.ReplaceAll(v, `"`, "")
+			v = strings.ReplaceAll(v, `"`, "")
+			t.assocLanguage = v
 		case "INSTREAM-ID":
-			out.InstreamId = strings.ReplaceAll(v, `"`, "")
+			v = strings.ReplaceAll(v, `"`, "")
+			t.instreamId = v
 		case "CHARACTERISTICS":
 			v = strings.ReplaceAll(v, `"`, "")
-			out.Characteristics = strings.Split(v, ",")
+			t.characteristics = strings.Split(v, ",")
 		case "CHANNELS":
-			out.Channels = strings.ReplaceAll(v, `"`, "")
+			v = strings.ReplaceAll(v, `"`, "")
+			t.channels = v
 		}
 	}
+}
 
-	return &out
+func (t *Media) GetType() string {
+	if !t.rawparsed {
+		t.parse()
+	}
+	return t.mediaType
+}
+
+func (t *Media) GetGroupId() string {
+	if !t.rawparsed {
+		t.parse()
+	}
+	return t.groupId
+}
+
+func (t *Media) GetName() string {
+	if !t.rawparsed {
+		t.parse()
+	}
+	return t.name
+}
+
+func (t *Media) GetAutoselect() bool {
+	if !t.rawparsed {
+		t.parse()
+	}
+	return t.isAutoselect
+}
+
+func (t *Media) GetDefault() bool {
+	if !t.rawparsed {
+		t.parse()
+	}
+	return t.isDefault
+}
+
+func (t *Media) GetUri() string {
+	if !t.rawparsed {
+		t.parse()
+	}
+	return t.uri
+}
+
+func (t *Media) GetLanguage() string {
+	if !t.rawparsed {
+		t.parse()
+	}
+	return t.language
+}
+
+func (t *Media) GetAssocLanguage() string {
+	if !t.rawparsed {
+		t.parse()
+	}
+	return t.assocLanguage
+}
+
+func (t *Media) GetForced() bool {
+	if !t.rawparsed {
+		t.parse()
+	}
+	return t.isForced
+}
+
+func (t *Media) GetInstreamId() string {
+	if !t.rawparsed {
+		t.parse()
+	}
+	return t.instreamId
+}
+
+func (t *Media) GetCharacteristics() []string {
+	if !t.rawparsed {
+		t.parse()
+	}
+	return t.characteristics
+}
+
+func (t *Media) GetChannels() string {
+	if !t.rawparsed {
+		t.parse()
+	}
+	return t.channels
 }

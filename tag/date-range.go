@@ -9,22 +9,27 @@ import (
 )
 
 type DateRange struct {
-	Id              string
-	Class           string
-	StartDate       *time.Time
-	EndDate         *time.Time
-	Duration        float64
-	PlannedDuration float64
-	EndOnNext       bool
-	Scte35Cmd       string
-	Scte35Out       string
-	Scte35In        string
+	raw       string
+	rawparsed bool
+
+	id              string
+	class           string
+	startDate       *time.Time
+	endDate         *time.Time
+	duration        float64
+	plannedDuration float64
+	endOnNext       bool
+	scte35Cmd       string
+	scte35Out       string
+	scte35In        string
 }
 
-func ParseDateRange(input string) *DateRange {
-	out := DateRange{}
+func NewDateRange(raw string) *DateRange {
+	return &DateRange{raw: raw}
+}
 
-	hm := scanner.ScanArgs(input)
+func (t *DateRange) parse() {
+	hm := scanner.ScanArgs(t.raw)
 	for k, v := range hm {
 		if k == "" || v == "" {
 			continue
@@ -32,9 +37,9 @@ func ParseDateRange(input string) *DateRange {
 
 		switch k {
 		case "ID":
-			out.Id = strings.ReplaceAll(v, `"`, "")
+			t.id = strings.ReplaceAll(v, `"`, "")
 		case "CLASS":
-			out.Class = strings.ReplaceAll(v, `"`, "")
+			t.class = strings.ReplaceAll(v, `"`, "")
 		case "START-DATE":
 			v = strings.ReplaceAll(v, `"`, "")
 			date, err := time.Parse(time.RFC3339, v)
@@ -42,7 +47,7 @@ func ParseDateRange(input string) *DateRange {
 				continue
 			}
 			date = date.In(time.UTC)
-			out.StartDate = &date
+			t.startDate = &date
 		case "END-DATE":
 			v = strings.ReplaceAll(v, `"`, "")
 			date, err := time.Parse(time.RFC3339, v)
@@ -50,30 +55,108 @@ func ParseDateRange(input string) *DateRange {
 				continue
 			}
 			date = date.In(time.UTC)
-			out.EndDate = &date
+			t.endDate = &date
 		case "END-ON-NEXT":
-			out.EndOnNext = v == "YES"
+			t.endOnNext = v == "YES"
 		case "DURATION":
 			parsed, err := strconv.ParseFloat(v, 64)
 			if err != nil {
-				out.Duration = 0
+				t.duration = 0
 			}
-			out.Duration = parsed
+			t.duration = parsed
 		case "PLANNED-DURATION":
 			parsed, err := strconv.ParseFloat(v, 64)
 			if err != nil {
-				out.PlannedDuration = 0
+				t.plannedDuration = 0
 			}
-			out.PlannedDuration = parsed
+			t.plannedDuration = parsed
 
 		case "SCTE35-CMD":
-			out.Scte35Cmd = strings.ReplaceAll(v, `"`, "")
+			t.scte35Cmd = strings.ReplaceAll(v, `"`, "")
 		case "SCTE35-OUT":
-			out.Scte35Out = strings.ReplaceAll(v, `"`, "")
+			t.scte35Out = strings.ReplaceAll(v, `"`, "")
 		case "SCTE35-IN":
-			out.Scte35In = strings.ReplaceAll(v, `"`, "")
+			t.scte35In = strings.ReplaceAll(v, `"`, "")
 		}
 	}
+}
 
-	return &out
+func (t *DateRange) GetId() string {
+	if !t.rawparsed {
+		t.parse()
+	}
+
+	return t.id
+}
+
+func (t *DateRange) GetClass() string {
+	if !t.rawparsed {
+		t.parse()
+	}
+
+	return t.class
+}
+
+func (t *DateRange) GetStartDate() *time.Time {
+	if !t.rawparsed {
+		t.parse()
+	}
+
+	return t.startDate
+}
+
+func (t *DateRange) GetEndDate() *time.Time {
+	if !t.rawparsed {
+		t.parse()
+	}
+
+	return t.endDate
+}
+
+func (t *DateRange) GetDuration() float64 {
+	if !t.rawparsed {
+		t.parse()
+	}
+
+	return t.duration
+}
+
+func (t *DateRange) GetPlannedDuration() float64 {
+	if !t.rawparsed {
+		t.parse()
+	}
+
+	return t.plannedDuration
+}
+
+func (t *DateRange) GetEndOnNext() bool {
+	if !t.rawparsed {
+		t.parse()
+	}
+
+	return t.endOnNext
+}
+
+func (t *DateRange) GetScte35Cmd() string {
+	if !t.rawparsed {
+		t.parse()
+	}
+
+	return t.scte35Cmd
+}
+
+func (t *DateRange) GetScte35Out() string {
+	if !t.rawparsed {
+		t.parse()
+	}
+
+	return t.scte35Out
+}
+
+func (t *DateRange) GetScte35In() string {
+	if !t.rawparsed {
+		t.parse()
+	}
+
+	return t.scte35In
 }

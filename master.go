@@ -27,12 +27,12 @@ func (pl *MasterPlaylist) MatchMasterTags(key string, value string) {
 		if pl.tmpvariant == nil {
 			pl.tmpvariant = &Variant{}
 		}
-		pl.tmpvariant.Media = tag.ParseMedia(value)
+		pl.tmpvariant.Media = tag.NewMedia(value)
 	case "EXT-X-STREAM-INF":
 		if pl.tmpvariant == nil {
 			pl.tmpvariant = &Variant{}
 		}
-		pl.tmpvariant.StreamInfo = tag.ParseStreamInfo(value)
+		pl.tmpvariant.StreamInfo = tag.NewStreamInfo(value)
 
 	case "EXT-X-I-FRAME-STREAM-INF":
 	case "EXT-X-SESSION-DATA":

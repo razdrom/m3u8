@@ -8,27 +8,42 @@ import (
 // https://datatracker.ietf.org/doc/html/rfc8216#section-4.3.2.1
 
 type Info struct {
-	Druation float64
-	Title    string
+	raw       string
+	rawparsed bool
+	duruation float64
+	title     string
 }
 
-func ParseInfo(input string) *Info {
-	out := Info{}
+func NewInfo(raw string) *Info {
+	return &Info{raw: raw}
+}
 
-	args := strings.Split(input, ",")
+func (t *Info) parse() {
+	args := strings.Split(t.raw, ",")
 	if len(args) < 1 {
-		return nil
+		return
 	}
 
 	duration, err := strconv.ParseFloat(args[0], 64)
 	if err != nil {
-		return nil
+		return
 	}
-	out.Druation = duration
+	t.duruation = duration
 
 	if len(args) == 2 {
-		out.Title = args[1]
+		t.title = args[1]
 	}
+}
 
-	return &out
+func (t *Info) GetDuration() float64 {
+	if !t.rawparsed {
+		t.parse()
+	}
+	return t.duruation
+}
+func (t *Info) GetTitle() string {
+	if !t.rawparsed {
+		t.parse()
+	}
+	return t.title
 }

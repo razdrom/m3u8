@@ -8,7 +8,7 @@ type Playlist interface {
 }
 
 type BasePlaylist struct {
-	Version int64
+	Version *tag.Version
 }
 
 func (pl *BasePlaylist) MatchBaseTags(key string, value string) {
@@ -17,10 +17,7 @@ func (pl *BasePlaylist) MatchBaseTags(key string, value string) {
 	// https://datatracker.ietf.org/doc/html/rfc8216#section-4.3.1
 	case "EXTM3U":
 	case "EXT-X-VERSION":
-		version := tag.ParseVersion(value)
-		if version != nil && version.Value != 0 {
-			pl.Version = version.Value
-		}
+		pl.Version = tag.NewVersion(value)
 
 	// Media or Master Playlist Tags
 	// https://datatracker.ietf.org/doc/html/rfc8216#section-4.3.5
