@@ -106,7 +106,7 @@ func Test_Decode_Media_001(t *testing.T) {
 
 	require.Equal(t, int64(3), playlist.Version.GetValue())
 	require.Equal(t, int64(6), playlist.TargetDuration.GetValue())
-	require.Equal(t, int64(60734), playlist.MediaSequence.GetValue())
+	require.Equal(t, uint64(60734), playlist.MediaSequence.GetValue())
 
 	dateranges := []map[string]string{
 		{"id": "playlist-creation-1728470443", "class": "timestamp", "startDate": "2024-10-09T03:40:43.795-07:00", "endOnNext": "YES"},

@@ -7,7 +7,7 @@ import (
 type MediaSequence struct {
 	raw       string
 	rawparsed bool
-	value     int64
+	value     uint64
 }
 
 func NewMediaSequence(raw string) *MediaSequence {
@@ -16,7 +16,7 @@ func NewMediaSequence(raw string) *MediaSequence {
 
 func (t *MediaSequence) parse() {
 	t.rawparsed = true
-	value, err := strconv.ParseInt(t.raw, 10, 64)
+	value, err := strconv.ParseUint(t.raw, 10, 64)
 	if err != nil {
 		return
 	}
@@ -24,7 +24,7 @@ func (t *MediaSequence) parse() {
 	t.value = value
 }
 
-func (t *MediaSequence) GetValue() int64 {
+func (t *MediaSequence) GetValue() uint64 {
 	if !t.rawparsed {
 		t.parse()
 	}
