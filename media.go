@@ -17,6 +17,7 @@ type MediaPlaylist struct {
 	MediaSequence  *tag.MediaSequence
 	DateRanges     []tag.DateRange
 	Segments       []Segment
+	EndList        bool
 }
 
 func (pl *MediaPlaylist) ParseTag(key string, value string) {
@@ -51,6 +52,7 @@ func (pl *MediaPlaylist) MatchCommonTags(key string, value string) {
 		pl.MediaSequence = tag.NewMediaSequence(value)
 	case "EXT-X-DISCONTINUITY-SEQUENCE":
 	case "EXT-X-ENDLIST":
+		pl.EndList = true
 	case "EXT-X-PLAYLIST-TYPE":
 	case "EXT-X-I-FRAMES-ONLY":
 	}
